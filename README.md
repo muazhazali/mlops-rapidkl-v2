@@ -2,6 +2,9 @@
 
 An end-to-end MLOps project using public transport ridership data from **data.gov.my**.
 
+py -m venv .venv
+ .\.venv\Scripts\Activate.ps1
+
 ## Goal
 
 Predict future public transport ridership while learning:

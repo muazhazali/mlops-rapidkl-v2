@@ -2,8 +2,71 @@
 
 An end-to-end MLOps project using public transport ridership data from **data.gov.my**.
 
-py -m venv .venv
- .\.venv\Scripts\Activate.ps1
+## Development Setup
+
+<details>
+<summary><strong>Recommended: Set up an existing clone with <code>uv sync</code></strong></summary>
+
+Install `uv` if it is not already available:
+
+**Windows (PowerShell)**
+
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+**Linux/macOS**
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+Restart the terminal, clone the repository, and install the locked dependencies:
+
+```bash
+git clone <repository-url>
+cd mlops-rapidkl-v2
+uv sync
+```
+
+`uv sync` creates `.venv` automatically and installs the versions recorded in
+`uv.lock`. Activation is optional when commands are run with `uv run`.
+
+To use `notebooks/01_eda.ipynb` in VS Code, select the interpreter at
+`.venv/Scripts/python.exe` on Windows or `.venv/bin/python` on Linux/macOS.
+
+</details>
+
+<details>
+<summary><strong>Set up a new <code>uv</code> project from scratch</strong></summary>
+
+Install `uv` using one of the commands above, then initialize the project and
+add its dependencies:
+
+```bash
+uv init
+uv add pandas pyarrow matplotlib seaborn jupyter h2o
+uv sync
+```
+
+To activate the virtual environment manually:
+
+**Windows (PowerShell)**
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+**Linux/macOS**
+
+```bash
+source .venv/bin/activate
+```
+
+Commit `pyproject.toml`, `uv.lock`, and `.python-version` so other users can
+reproduce the environment with `uv sync`. Do not commit `.venv`.
+
+</details>
 
 ## Goal
 
@@ -70,11 +133,10 @@ transport-mlops/
 
 ## Development
 
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
+Run commands inside the managed environment without activating it:
 
-pip install -r requirements.txt
+```bash
+uv run <command>
 ```
 
 Run tests:

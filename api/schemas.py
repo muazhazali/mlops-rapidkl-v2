@@ -23,3 +23,20 @@ class PredictResponse(BaseModel):
     target_date: date
     target: str
     predicted_ridership: float
+
+
+class ForecastPoint(BaseModel):
+    """A single actual-vs-predicted data point."""
+
+    date: date
+    actual: float | None = None
+    predicted: float | None = None
+
+
+class ForecastResponse(BaseModel):
+    """Response body for the /forecast endpoint."""
+
+    target: str
+    start_date: date
+    end_date: date
+    points: list[ForecastPoint]

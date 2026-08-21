@@ -26,7 +26,7 @@ Restart the terminal, clone the repository, and install the locked dependencies:
 ```bash
 git clone <repository-url>
 cd mlops-rapidkl-v2
-uv sync
+uv sync --extra model --extra api --extra dev
 ```
 
 `uv sync` creates `.venv` automatically and installs the versions recorded in
@@ -119,16 +119,32 @@ Cloudflare Tunnel
 ## Project Structure
 
 ```text
-transport-mlops/
-├── src/
-├── api/
-├── tests/
-├── data/
-├── models/
-├── notebooks/
-├── Containerfile
-├── compose.yml
-└── requirements.txt
+mlops-rapidkl-v2/
+├── src/                    # rapidkl package (config, data, features, train, predict)
+│   ├── __init__.py
+│   ├── config.py           # TARGET, FEATURE_COLUMNS, split dates, paths
+│   ├── data.py             # load parquet/CSV
+│   ├── validate.py         # schema & quality assertions
+│   ├── features.py         # calendar, holiday, lag, rolling features
+│   ├── dataset.py          # train/val/test splits, X/y
+│   ├── metrics.py          # MAE, RMSE, WMAPE
+│   ├── train.py            # XGBoost + MLflow tracking
+│   └── predict.py          # load/predict from MLflow registry
+├── api/                    # FastAPI service
+│   ├── __init__.py
+│   ├── main.py             # /health, /predict endpoints
+│   ├── schemas.py          # Pydantic request/response models
+│   ├── loader.py           # cached MLflow model loading
+│   └── features_service.py # build features for a future date
+├── tests/                  # pytest suite (data, features, predict, API)
+├── data/                   # ridership parquet + CSV
+├── notebooks/              # EDA + model experiments
+├── .github/workflows/
+│   └── ci.yml               # lint + test on push/PR
+├── Containerfile           # Podman/Docker image (uv-based)
+├── compose.yml              # api + mlflow + postgres
+├── pyproject.toml
+└── uv.lock
 ```
 
 ## Development
@@ -139,19 +155,45 @@ Run commands inside the managed environment without activating it:
 uv run <command>
 ```
 
+Install all optional dependencies (model, api, dev):
+
+```bash
+uv sync --extra model --extra api --extra dev
+```
+
+Train the model (logs to MLflow, registers with Production alias):
+
+```bash
+uv run python -c "from rapidkl.train import train_model; r = train_model(); print(r['val_metrics'], r['test_metrics'])"
+```
+
 Run tests:
 
 ```bash
-pytest
+uv run pytest
 ```
 
-Run API:
+Lint:
 
 ```bash
-uvicorn api.main:app --reload --port 8000
+uv run ruff check src/ api/ tests/
 ```
 
-Start services:
+Run API locally:
+
+```bash
+uv run uvicorn api.main:app --reload --port 8000
+```
+
+Predict via API:
+
+```bash
+curl -X POST http://localhost:8000/predict \
+  -H "Content-Type: application/json" \
+  -d '{"target_date": "2026-07-01", "target": "rail_mrt_kajang"}'
+```
+
+Start services (api + mlflow + postgres):
 
 ```bash
 podman compose up -d
@@ -164,11 +206,11 @@ git push
    ↓
 GitHub Actions
    ↓
-Lint + Tests
+Lint (ruff) + Tests (pytest)
    ↓
 Build Container
    ↓
-Deploy to Proxmox
+Deploy to Proxmox (TODO)
 ```
 
 ## Future Improvements

@@ -16,3 +16,10 @@ __pycache__/
 
 # ruff
 .ruff_cache/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
+# Built frontend (served by FastAPI)
+api/static/

@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from datetime import date
 
+import numpy as np
 import pandas as pd
 from rapidkl.config import FEATURE_COLUMNS, TARGET
 from rapidkl.data import load_data
@@ -67,3 +68,72 @@ def build_features_for_date(
 
     row = featured.loc[[pd.Timestamp(target_date)]]
     return row[FEATURE_COLUMNS]
+
+
+def build_forecast(
+    start_date: date,
+    end_date: date,
+    target: str = TARGET,
+    model=None,
+) -> pd.DataFrame:
+    """Build actual vs predicted ridership for a date range.
+
+    For dates within the known history, predictions are one-step-ahead (lags
+    use actual values). For dates beyond the history, predictions are recursive
+    (predicted values feed back as lag inputs for subsequent days).
+
+    Returns a DataFrame indexed by date with columns: actual, predicted.
+    ``actual`` is NaN for future dates where no ground truth exists.
+    """
+    from rapidkl.predict import predict as _predict
+
+    history = _load_history()
+    history_series = history[target].astype("float64").copy()
+
+    all_dates = pd.date_range(
+        start=pd.Timestamp(start_date), end=pd.Timestamp(end_date), freq="D"
+    )
+    last_known = history.index.max()
+
+    if model is None:
+        from api.loader import get_model
+        model = get_model()
+
+    actuals = history_series.reindex(all_dates)
+
+    combined = history_series.copy()
+    predictions: dict[pd.Timestamp, float] = {}
+
+    for dt in all_dates:
+        ts = pd.Timestamp(dt)
+
+        if ts > last_known:
+            temp_series = combined.copy()
+            temp_series.loc[ts] = float("nan")
+        else:
+            temp_series = combined.copy()
+
+        temp_df = pd.DataFrame({target: temp_series})
+        featured = build_features(temp_df, target)
+
+        if ts not in featured.index:
+            continue
+
+        row = featured.loc[[ts], FEATURE_COLUMNS]
+        if row.isna().any().any():
+            continue
+
+        pred = float(_predict(model, row).iloc[0])
+        predictions[ts] = pred
+
+        if ts > last_known:
+            combined.loc[ts] = pred
+
+    result = pd.DataFrame(
+        {
+            "actual": actuals.values,
+            "predicted": [predictions.get(dt, np.nan) for dt in all_dates],
+        },
+        index=all_dates,
+    )
+    return result

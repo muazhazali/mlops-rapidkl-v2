@@ -1,3 +1,11 @@
+FROM docker.io/node:22-slim AS frontend
+WORKDIR /frontend
+RUN npm install -g pnpm
+COPY frontend/package.json frontend/pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
+COPY frontend/ ./
+RUN pnpm build
+
 FROM ghcr.io/astral-sh/uv:python3.14-bookworm-slim
 
 WORKDIR /app
@@ -9,6 +17,8 @@ COPY pyproject.toml uv.lock ./
 COPY src/ src/
 COPY api/ api/
 COPY data/ data/
+
+COPY --from=frontend /app/static/ api/static/
 
 RUN uv sync --frozen --extra api --extra model --no-dev
 

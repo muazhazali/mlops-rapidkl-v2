@@ -12,14 +12,19 @@ import type { ForecastPoint } from '../types'
 
 interface Props {
   data: ForecastPoint[]
+  fullDateRange: { start: string; end: string } | null
 }
 
-export function ForecastChart({ data }: Props) {
+export function ForecastChart({ data, fullDateRange }: Props) {
   const chartData = data.map((p) => ({
     date: p.date,
     actual: p.actual,
     predicted: p.predicted,
   }))
+
+  const xDomain = fullDateRange
+    ? [fullDateRange.start, fullDateRange.end]
+    : undefined
 
   return (
     <ResponsiveContainer width="100%" height={450}>
@@ -30,6 +35,8 @@ export function ForecastChart({ data }: Props) {
           tick={{ fontSize: 12 }}
           interval="preserveStartEnd"
           minTickGap={30}
+          domain={xDomain}
+          allowDuplicatedCategory={false}
         />
         <YAxis
           tick={{ fontSize: 12 }}
@@ -44,20 +51,22 @@ export function ForecastChart({ data }: Props) {
           type="monotone"
           dataKey="actual"
           stroke="#2563eb"
-          strokeWidth={2}
+          strokeWidth={2.5}
           dot={false}
           name="Actual"
           connectNulls={false}
+          isAnimationActive={false}
         />
         <Line
           type="monotone"
           dataKey="predicted"
           stroke="#ea580c"
-          strokeWidth={2}
+          strokeWidth={2.5}
           strokeDasharray="5 5"
           dot={false}
           name="Predicted"
           connectNulls={false}
+          isAnimationActive={false}
         />
       </LineChart>
     </ResponsiveContainer>

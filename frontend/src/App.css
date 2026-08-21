@@ -73,6 +73,180 @@
   margin-bottom: 16px;
 }
 
+/* Current value card */
+.value-card-row {
+  margin-bottom: 16px;
+}
+
+.value-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 20px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+}
+
+.value-card.empty {
+  color: var(--text);
+  text-align: center;
+}
+
+.value-card-date {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.value-card-grid {
+  display: flex;
+  gap: 32px;
+}
+
+.value-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.value-label {
+  font-size: 12px;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.value-number {
+  font-size: 20px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.value-number.actual {
+  color: #2563eb;
+}
+
+.value-number.predicted {
+  color: #ea580c;
+}
+
+.value-number.error {
+  color: var(--text);
+  font-size: 16px;
+}
+
+/* Playback controls */
+.playback-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.playback-controls .play-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--accent);
+  color: white;
+  transition: opacity 0.2s;
+}
+
+.playback-controls .play-btn:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.playback-controls .play-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.playback-controls .reset-btn {
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  background: var(--bg);
+  color: var(--text-h);
+  transition: opacity 0.2s;
+}
+
+.playback-controls .reset-btn:hover {
+  opacity: 0.7;
+}
+
+.speed-control {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.speed-label {
+  font-size: 12px;
+  color: var(--text);
+  padding: 0 6px;
+}
+
+.speed-btn {
+  padding: 4px 10px;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text);
+  transition: all 0.15s;
+}
+
+.speed-btn.active {
+  background: var(--accent);
+  color: white;
+  font-weight: 600;
+}
+
+.speed-btn:hover:not(.active) {
+  background: var(--accent-bg);
+}
+
+.progress-bar {
+  flex: 1;
+  min-width: 100px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-size: 13px;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.scrubber {
+  width: 100%;
+  margin-bottom: 16px;
+  cursor: pointer;
+}
+
+/* Stats */
 .stats {
   display: flex;
   gap: 24px;

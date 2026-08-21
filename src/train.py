@@ -91,13 +91,14 @@ def train_model(
         )
 
         client = mlflow.tracking.MlflowClient()
-        if mv and mv.version:
-            client.set_registered_model_alias(model_name, "Production", mv.version)
+        version = mv.registered_model_version if mv else None
+        if version:
+            client.set_registered_model_alias(model_name, "Production", version)
 
         return {
             "model": model,
             "run_id": run.info.run_id,
-            "model_version": mv.version if mv else None,
+            "model_version": version,
             "val_metrics": val_metrics,
             "test_metrics": test_metrics,
             "feature_columns": features,

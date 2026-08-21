@@ -1,3 +1,18 @@
 # venv
 .venv/
 
+# MLflow artifacts
+mlruns/
+mlflow.db
+mlflow.db-journal
+
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+
+# pytest
+.pytest_cache/
+
+# ruff
+.ruff_cache/

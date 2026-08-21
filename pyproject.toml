@@ -1,7 +1,7 @@
 [project]
 name = "mlops-rapidkl-v2"
 version = "0.1.0"
-description = "Add your description here"
+description = "End-to-end MLOps for Malaysian public transport ridership forecasting"
 readme = "README.md"
 authors = [
     { name = "Muaz Hazali", email = "100086292+muazhazali@users.noreply.github.com" }
@@ -12,14 +12,43 @@ dependencies = [
     "holidays>=0.102",
     "jupyter>=1.1.1",
     "matplotlib>=3.11.1",
-    "pandas>=3.0.5",
+    "pandas>=2.1",
     "pyarrow>=25.0.1",
     "seaborn>=0.13.2",
 ]
 
+[project.optional-dependencies]
+model = [
+    "mlflow>=3.3.0",
+    "scikit-learn>=1.7.0",
+    "xgboost>=3.0.2",
+]
+api = [
+    "fastapi>=0.116.0",
+    "uvicorn>=0.35.0",
+]
+dev = [
+    "pytest>=8.0.0",
+    "ruff>=0.12.0",
+]
+
 [project.scripts]
-mlops-rapidkl-v2 = "mlops_rapidkl_v2:main"
+mlops-rapidkl-v2 = "rapidkl:main"
+
+[tool.setuptools]
+packages = ["rapidkl", "api"]
+package-dir = {"rapidkl" = "src", "api" = "api"}
+
+[tool.ruff]
+line-length = 88
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
 
 [build-system]
-requires = ["uv_build>=0.12.3,<0.13.0"]
-build-backend = "uv_build"
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"

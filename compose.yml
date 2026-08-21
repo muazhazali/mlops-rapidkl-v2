@@ -1,0 +1,58 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Containerfile
+    ports:
+      - "8000:8000"
+    environment:
+      MLFLOW_TRACKING_URI: sqlite:///mlflow.db
+    volumes:
+      - mlflow-data:/app/mlruns
+      - mlflow-db:/app/mlflow.db
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    depends_on:
+      mlflow:
+        condition: service_healthy
+
+  mlflow:
+    image: ghcr.io/astral-sh/uv:python3.14-bookworm-slim
+    command: >
+      uv run mlflow server
+      --backend-store-uri sqlite:///mlflow.db
+      --default-artifact-root ./mlruns
+      --host 0.0.0.0 --port 5000
+    ports:
+      - "5000:5000"
+    environment:
+      UV_LINK_MODE: copy
+    volumes:
+      - mlflow-data:/app/mlruns
+      - mlflow-db:/app/mlflow.db
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ridership
+      POSTGRES_USER: rapidkl
+      POSTGRES_PASSWORD: changeme
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+
+volumes:
+  mlflow-data:
+  mlflow-db:
+  pg-data:
